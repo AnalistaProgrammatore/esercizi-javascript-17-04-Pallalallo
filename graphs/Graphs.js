@@ -1,7 +1,21 @@
 const PriorityQueue = require('../structs/PriorityQueue')
 const Queue = require('../structs/Queue')
 const Stack = require('../structs/Stack')
+const CreateGraph = require('./create-graph')
 
+class Vertex {
+  constructor(key, city = undefined) {
+    this.key = key
+    this.city = city
+  }
+}
+class Edge {
+  constructor(vertex1, vertex2, weight) {
+    this.vertex1 = vertex1
+    this.vertex2 = vertex2
+    this.weight = weight
+  }
+}
 /** ABSTRACT DATA TYPE per le linked list
  * @property edges -> Lista di adiacenza dei singoli vertici
  * @property vertex -> Lista dei vertici presenti nel grafo
@@ -20,29 +34,32 @@ class Graph {
   }
 
   addVertex(vertex) {
-    this.vertex.push(vertex)
+    let vertice = new Vertex(vertex)
+    this.vertex.push(vertice)
     this.edges[vertex] = []
   }
 
   addEdge(vertex1, vertex2, weight = 1) {
-    this.edges[vertex1].push({ vertex: vertex2, weight })
-    this.edges[vertex2].push({ vertex: vertex1, weight })
+    let newEdge = new Edge(vertex1, vertex2, weight)
+    this.edges[newEdge.vertex1.key].push(newEdge)
+    this.edges[newEdge.vertex2.key].push(newEdge)
+    console.log(this.edges)
   }
 
   addDirectEdge(vertex1, vertex2, weight = 1) {
-    this.edges[vertex1].push({ vertex: vertex2, weight })
+    this.edges[vertex1].push(vertex2, weight)
   }
 
   display() {
     let graph = '';
-    for(const vertex of this.vertex) {
-      const edges = this.edges[vertex].map(edge => edge.vertex)
-      graph += `${vertex} -> ${edges.join(', ')} \n`
+    for (const vertex of this.vertex) {
+      const edges = this.edges[vertex.key].map(edge => edge)
+      graph += `${vertex.key} -> ${edges.join(', ')} \n`
     }
     console.log(graph)
   }
 
-  dfs(vertex){
+  dfs(vertex) {
     // creo la struttura dati di appoggio e il Set dei vertici esplorati
     const stack = new Stack(this.vertex.length)
     const explored = new Set()
@@ -50,7 +67,7 @@ class Graph {
     stack.push(vertex)
     explored.add(vertex)
     // MAIN LOOP finchè la struttura di appoggio non è vuota
-    while(!stack.isEmpty()){
+    while (!stack.isEmpty()) {
       // estraggo l'elemento corrente
       const current = stack.pop()
       // applico una funzione all'elemento corrente
@@ -61,7 +78,7 @@ class Graph {
        * 3. e li marchiamo come visitati
        */
       const edges = this.edges[current].filter(edge => !explored.has(edge.vertex))
-      for(const edge of edges) {
+      for (const edge of edges) {
         stack.push(edge.vertex)
         explored.add(edge.vertex)
       }
@@ -69,16 +86,16 @@ class Graph {
   }
 
   /** VEDI COMMENTI DSF */
-  bfs(vertex){
+  bfs(vertex) {
     const queue = new Queue(this.vertex.length)
     const explored = new Set()
     queue.enqueue(vertex)
     explored.add(vertex)
-    while(!queue.isEmpty()) {
+    while (!queue.isEmpty()) {
       const current = queue.dequeue()
       console.log(current)
       const edges = this.edges[current].filter(edge => !explored.has(edge.vertex))
-      for(const neighbor of edges) {
+      for (const neighbor of edges) {
         queue.enqueue(neighbor.vertex)
         explored.add(neighbor.vertex)
       }
@@ -93,7 +110,7 @@ class Graph {
     const distances = {}
     const paths = {}
     const pq = new PriorityQueue(this.vertex.length * this.vertex.length)
-    
+
     /**
      * IMPOSTO IL RISULTATO DEL VERTICE DI PARTENZA
      * possiamo facilmente calcolare i risultati per il vertice di partenza essendo a distanza 0
@@ -101,7 +118,7 @@ class Graph {
      */
     distances[startVertex] = 0
     pq.enqueue(startVertex, 0)
-    
+
     /** INIZIALIZZO I RISULTATI
      * imposto la distanza iniziale di tutti i vertici tranne startVertex da startVertex ad infinito
      * e imposto tutti i percorsi ad un nuovo Set
@@ -109,20 +126,20 @@ class Graph {
      * e imposto il primo elemento di ogni vertice tranne startVertex a startVertex
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
      */
-    for(const vertex of this.vertex) {
-      if(vertex !== startVertex) {
+    for (const vertex of this.vertex) {
+      if (vertex !== startVertex) {
         distances[vertex] = Infinity
       }
       paths[vertex] = new Set()
-      if(vertex !== startVertex) paths[vertex].add(startVertex)
+      if (vertex !== startVertex) paths[vertex].add(startVertex)
     }
 
     /** MAIN LOOP */
-    while(!pq.isEmpty()) {
+    while (!pq.isEmpty()) {
       const minCurrentNode = pq.dequeue() // estraggo il vertice con peso minimo dalla coda
       const currentVertex = minCurrentNode.data
       /** CICLO I VICINI DEL VERTICE PRECEDENTEMENTE ESTRATTO */
-      for(const neighbor of this.edges[currentVertex]) {
+      for (const neighbor of this.edges[currentVertex]) {
         /** 
          * calcolo la distanza tra il vicino (nighbor) e la distanza immagazinata per il vertice
          * estratto precedentemente
@@ -132,7 +149,7 @@ class Graph {
          * Se la distanza calcolata è minore alla distanza precedentemente immagazzinata
          * per il vicino (nighbor) allora ho trovato un cammino più breve da inserire tra i risultati
          */
-        if(distance < distances[neighbor.vertex]) {
+        if (distance < distances[neighbor.vertex]) {
           // inserisco la distanza minima trovata per il neighbor nei risultati
           distances[neighbor.vertex] = distance
           /*
@@ -150,3 +167,12 @@ class Graph {
 }
 
 module.exports = Graph
+/*let graph = new Graph()
+graph.addVertex(1)
+graph.addVertex(2)
+graph.addEdge(graph.vertex[0], graph.vertex[1], 2)
+graph.display()*/
+vertici = [1, 2, 4, 5]
+spigoli = [1, 2, 1, 2, 3, 1, 2, 3, 1, 1, 2, 3, 1, 3, 2]
+CreateGraph(vertici, spigoli)
+console.log(graph)
