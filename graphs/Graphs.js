@@ -1,7 +1,7 @@
 const PriorityQueue = require('../structs/PriorityQueue')
 const Queue = require('../structs/Queue')
 const Stack = require('../structs/Stack')
-const CreateGraph = require('./create-graph')
+
 
 class Vertex {
   constructor(key, city = undefined) {
@@ -36,14 +36,14 @@ class Graph {
   addVertex(vertex) {
     let vertice = new Vertex(vertex)
     this.vertex.push(vertice)
-    this.edges[vertex] = []
+    this.edges[vertice.key] = []
   }
 
   addEdge(vertex1, vertex2, weight = 1) {
     let newEdge = new Edge(vertex1, vertex2, weight)
     this.edges[newEdge.vertex1.key].push(newEdge)
     this.edges[newEdge.vertex2.key].push(newEdge)
-    console.log(this.edges)
+
   }
 
   addDirectEdge(vertex1, vertex2, weight = 1) {
@@ -52,9 +52,14 @@ class Graph {
 
   display() {
     let graph = '';
-    for (const vertex of this.vertex) {
-      const edges = this.edges[vertex.key].map(edge => edge)
-      graph += `${vertex.key} -> ${edges.join(', ')} \n`
+    for (const vertice of this.vertex) {
+      const edges = this.edges[vertice.key].map(edge => {
+        if (edge.vertex1.key === vertice.key) { return `Vertex: ${edge.vertex2.key}, City: ${edge.vertex2.city}, Weight: ${edge.weight}` }
+        else {
+          return `Vertex: ${edge.vertex1.key}, City: ${edge.vertex1.city}, Weight: ${edge.weight}`
+        }
+      })
+      graph += `${vertice.key} ->` + '\n' + edges.join(',\n') + '\n'
     }
     console.log(graph)
   }
@@ -166,13 +171,11 @@ class Graph {
   }
 }
 
-module.exports = Graph
+module.exports = { Graph, Vertex, Edge }
 /*let graph = new Graph()
 graph.addVertex(1)
 graph.addVertex(2)
 graph.addEdge(graph.vertex[0], graph.vertex[1], 2)
 graph.display()*/
-vertici = [1, 2, 4, 5]
-spigoli = [1, 2, 1, 2, 3, 1, 2, 3, 1, 1, 2, 3, 1, 3, 2]
-CreateGraph(vertici, spigoli)
-console.log(graph)
+const nuovoGrafo = require('./create-graph')
+nuovoGrafo.display()

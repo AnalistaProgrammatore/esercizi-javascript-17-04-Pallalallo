@@ -1,17 +1,17 @@
-let Grafo = require('./Graphs')
+const { Graph, Vertex, Edge } = require('./Graphs.js')
 function createGraph(vertices, funcEdges) {
-    let graph = new Grafo()
-    let spigoli = []
+    let graph = new Graph()
     for (let i = 0; i < vertices.length; i++) {
-        graph.vertex[i] = new vertex(vertices[i])
-        graph.edges[vertex[i].key] = []
+        graph.vertex[i] = new Vertex(vertices[i])
+        graph.edges[graph.vertex[i].key] = []
     }
     for (let i = 0; i < funcEdges.length; i++) {
-        spigoli[i] = new Edge(funcEdges[i][0], funcEdges[i][1], funcEdges[i][2])
-        graph.edges[spigoli[i].vertex1.key] = spigoli[i]
-        graph.edges[spigoli[i].vertex2.key] = spigoli[i]
+        graph.addEdge(graph.vertex.find(el => el.key == funcEdges[i][0]), graph.vertex.find(el => el.key == funcEdges[i][1]), funcEdges[i][2])
     }
     return graph
 }
+vertici = [1, 2, 4, 5]
+spig = [[1, 2, 1], [1, 4, 1], [2, 4, 1], [1, 5, 3], [4, 5, 2]]
+grafo = createGraph(vertici, spig)
 
-module.exports = createGraph
+module.exports = grafo
